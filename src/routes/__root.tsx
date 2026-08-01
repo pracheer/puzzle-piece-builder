@@ -79,10 +79,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Latchgraph" },
-      { name: "description", content: "Turn repositories and cloud environments into navigable architecture diagrams." },
+      { title: "Latchgraph — Map your codebase into an architecture diagram" },
+      { name: "description", content: "Point Latchgraph at a GitHub repo and cloud environment. It builds a knowledge graph of your system and renders a navigable architecture diagram." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:title", content: "Latchgraph — Map your codebase into an architecture diagram" },
+      { name: "twitter:title", content: "Latchgraph — Map your codebase into an architecture diagram" },
+      { property: "og:description", content: "Point Latchgraph at a GitHub repo and cloud environment. It builds a knowledge graph of your system and renders a navigable architecture diagram." },
+      { name: "twitter:description", content: "Point Latchgraph at a GitHub repo and cloud environment. It builds a knowledge graph of your system and renders a navigable architecture diagram." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c0624cef-15ae-472a-a019-eb4e20b95e67/id-preview-2a3430eb--b85224d5-2e31-485d-a042-9b20706266fe.lovable.app-1785614676456.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c0624cef-15ae-472a-a019-eb4e20b95e67/id-preview-2a3430eb--b85224d5-2e31-485d-a042-9b20706266fe.lovable.app-1785614676456.png" },
     ],
     links: [
       {

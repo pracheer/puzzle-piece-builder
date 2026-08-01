@@ -11,11 +11,11 @@ export const Route = createFileRoute("/")({
         content:
           "Point Latchgraph at a GitHub repo and cloud environment. It builds a knowledge graph of your system and renders a navigable architecture diagram.",
       },
-      { property: "og:title", content: "Latchgraph — Codebase to architecture diagram" },
+      { property: "og:title", content: "Latchgraph — Map your codebase into an architecture diagram" },
       {
         property: "og:description",
         content:
-          "Ingest repositories and cloud accounts, get a live knowledge graph and architecture diagram you can explore layer by layer.",
+          "Point Latchgraph at a GitHub repo and cloud environment. It builds a knowledge graph of your system and renders a navigable architecture diagram.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
