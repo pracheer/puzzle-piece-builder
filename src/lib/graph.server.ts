@@ -218,7 +218,7 @@ export async function buildGraphFromRepo(ref: RepoRef): Promise<BuiltGraph> {
     const segments = file.path.split("/");
     const top = segments.length > 1 ? segments[0]! : "(root files)";
     if (IGNORED_DIRS.test(top)) continue;
-    const entry = modules.get(top) ?? { files: 0, langs: new Map(), sample: [] };
+    const entry: ModuleInfo = modules.get(top) ?? { files: 0, langs: new Map<string, number>(), sample: [] };
     entry.files += 1;
     const ext = file.path.split(".").pop()?.toLowerCase() ?? "";
     const lang = LANG_BY_EXT[ext];
