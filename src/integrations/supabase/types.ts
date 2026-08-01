@@ -14,7 +14,204 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cloud_accounts: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          project_id: string
+          provider: string
+          region: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          project_id: string
+          provider: string
+          region?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          project_id?: string
+          provider?: string
+          region?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cloud_accounts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      graph_edges: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          project_id: string
+          source_key: string
+          target_key: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind?: string
+          project_id: string
+          source_key: string
+          target_key: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          project_id?: string
+          source_key?: string
+          target_key?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "graph_edges_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      graph_nodes: {
+        Row: {
+          created_at: string
+          details: Json
+          id: string
+          kind: string
+          label: string
+          layer: string
+          node_key: string
+          path: string | null
+          project_id: string
+          user_id: string
+          weight: number
+        }
+        Insert: {
+          created_at?: string
+          details?: Json
+          id?: string
+          kind: string
+          label: string
+          layer?: string
+          node_key: string
+          path?: string | null
+          project_id: string
+          user_id: string
+          weight?: number
+        }
+        Update: {
+          created_at?: string
+          details?: Json
+          id?: string
+          kind?: string
+          label?: string
+          layer?: string
+          node_key?: string
+          path?: string | null
+          project_id?: string
+          user_id?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "graph_nodes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      projects: {
+        Row: {
+          created_at: string
+          default_branch: string | null
+          edge_count: number
+          id: string
+          last_scan_at: string | null
+          name: string
+          node_count: number
+          repo_url: string
+          status: string
+          status_detail: string | null
+          summary: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          default_branch?: string | null
+          edge_count?: number
+          id?: string
+          last_scan_at?: string | null
+          name: string
+          node_count?: number
+          repo_url: string
+          status?: string
+          status_detail?: string | null
+          summary?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          default_branch?: string | null
+          edge_count?: number
+          id?: string
+          last_scan_at?: string | null
+          name?: string
+          node_count?: number
+          repo_url?: string
+          status?: string
+          status_detail?: string | null
+          summary?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
