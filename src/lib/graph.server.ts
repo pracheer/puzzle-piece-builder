@@ -213,7 +213,8 @@ export async function buildGraphFromRepo(ref: RepoRef): Promise<BuiltGraph> {
   });
 
   // Modules = top level directories (plus a root-files bucket).
-  const modules = new Map<string, { files: number; langs: Map<string, number>; sample: string[] }>();
+  type ModuleInfo = { files: number; langs: Map<string, number>; sample: string[] };
+  const modules = new Map<string, ModuleInfo>();
   for (const file of files) {
     const segments = file.path.split("/");
     const top = segments.length > 1 ? segments[0]! : "(root files)";
