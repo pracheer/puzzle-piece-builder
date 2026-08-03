@@ -16,12 +16,31 @@ const CloudAccountInput = z.object({
   region: z.string().trim().max(40).optional(),
 });
 
+const NOT_FOUND = "Project not found";
+
+async function assertProjectOwnership(
+  supabase: { from: (table: "projects") => any },
+  projectId: string,
+  userId: string,
+) {
+  const { data, error } = await supabase
+    .from("projects")
+    .select("id, user_id")
+    .eq("id", projectId)
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) throw new Error(NOT_FOUND);
+  if (!data) throw new Error(NOT_FOUND);
+  return data as { id: string; user_id: string };
+}
+
 export const listProjects = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("projects")
       .select("id, name, repo_url, status, node_count, edge_count, last_scan_at, created_at, summary")
+      .eq("user_id", context.userId)
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
     return data ?? [];
@@ -31,18 +50,34 @@ export const getProject = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => ProjectIdInput.parse(input))
   .handler(async ({ data, context }) => {
+    await assertProjectOwnership(context.supabase, data.projectId, context.userId);
+
     const [project, nodes, edges, clouds] = await Promise.all([
-      context.supabase.from("projects").select("*").eq("id", data.projectId).maybeSingle(),
+      context.supabase
+        .from("projects")
+        .select("*")
+        .eq("id", data.projectId)
+        .eq("user_id", context.userId)
+        .maybeSingle(),
       context.supabase
         .from("graph_nodes")
         .select("*")
         .eq("project_id", data.projectId)
+        .eq("user_id", context.userId)
         .order("weight", { ascending: false }),
-      context.supabase.from("graph_edges").select("*").eq("project_id", data.projectId),
-      context.supabase.from("cloud_accounts").select("*").eq("project_id", data.projectId),
+      context.supabase
+        .from("graph_edges")
+        .select("*")
+        .eq("project_id", data.projectId)
+        .eq("user_id", context.userId),
+      context.supabase
+        .from("cloud_accounts")
+        .select("*")
+        .eq("project_id", data.projectId)
+        .eq("user_id", context.userId),
     ]);
     if (project.error) throw new Error(project.error.message);
-    if (!project.data) throw new Error("Project not found");
+    if (!project.data) throw new Error(NOT_FOUND);
     return {
       project: project.data,
       nodes: nodes.data ?? [],
@@ -75,7 +110,12 @@ export const deleteProject = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => ProjectIdInput.parse(input))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("projects").delete().eq("id", data.projectId);
+    await assertProjectOwnership(context.supabase, data.projectId, context.userId);
+    const { error } = await context.supabase
+      .from("projects")
+      .delete()
+      .eq("id", data.projectId)
+      .eq("user_id", context.userId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -84,6 +124,7 @@ export const addCloudAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => CloudAccountInput.parse(input))
   .handler(async ({ data, context }) => {
+    await assertProjectOwnership(context.supabase, data.projectId, context.userId);
     const { error } = await context.supabase.from("cloud_accounts").insert({
       project_id: data.projectId,
       user_id: context.userId,
@@ -104,15 +145,18 @@ export const scanProject = createServerFn({ method: "POST" })
 
     const { data: project, error: loadError } = await supabase
       .from("projects")
-      .select("id, repo_url")
+      .select("id, repo_url, user_id")
       .eq("id", data.projectId)
-      .single();
-    if (loadError) throw new Error(loadError.message);
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (loadError) throw new Error(NOT_FOUND);
+    if (!project || project.user_id !== context.userId) throw new Error(NOT_FOUND);
 
     await supabase
       .from("projects")
       .update({ status: "scanning", status_detail: "Fetching repository structure", updated_at: new Date().toISOString() })
-      .eq("id", project.id);
+      .eq("id", project.id)
+      .eq("user_id", context.userId);
 
     try {
       const graph = await buildGraphFromRepo(parseRepoUrl(project.repo_url));
