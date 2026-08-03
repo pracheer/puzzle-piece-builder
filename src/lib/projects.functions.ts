@@ -145,15 +145,18 @@ export const scanProject = createServerFn({ method: "POST" })
 
     const { data: project, error: loadError } = await supabase
       .from("projects")
-      .select("id, repo_url")
+      .select("id, repo_url, user_id")
       .eq("id", data.projectId)
-      .single();
-    if (loadError) throw new Error(loadError.message);
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (loadError) throw new Error(NOT_FOUND);
+    if (!project || project.user_id !== context.userId) throw new Error(NOT_FOUND);
 
     await supabase
       .from("projects")
       .update({ status: "scanning", status_detail: "Fetching repository structure", updated_at: new Date().toISOString() })
-      .eq("id", project.id);
+      .eq("id", project.id)
+      .eq("user_id", context.userId);
 
     try {
       const graph = await buildGraphFromRepo(parseRepoUrl(project.repo_url));
